@@ -28,10 +28,10 @@ date_5_f = str(date_today).replace(date_today_ls[2], str(date_5i))
 
 
 #config
-config_file = r"D:\python projects\api projects\weatherapp\config.ini"
+config_file = ''##mention the path to a config.ini file which contains your api credentials
 config = ConfigParser()
 config.read(config_file)
-api_key = config['owa']['owmapi']
+api_key = config['owa']['owmapi'] ##replace owa and owmapi with the api key you received from openweathermap.org
 url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}'
 
 # weather details
@@ -203,7 +203,7 @@ wind_spd5 = tk.Label(window,text="                 ",font={'bold',20},bg='#FFF9F
 wind_spd5.grid(row=6,column=6,pady=20)
 
 
-img = Image.open(r'D:\python projects\api projects\weatherapp\images\Untitled2.png')
+img = Image.open('<Enter your logo here>') ##enter a logo of your brand of your choice
 img=img.resize((590,60),Image.ANTIALIAS)
 img=ImageTk.PhotoImage(img)
 wforecast = tk.Label(window,image=img,bg="#FFEDED",highlightthickness=0,fg="#FFEDED")
