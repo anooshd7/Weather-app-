@@ -8,6 +8,9 @@ from configparser import ConfigParser, DuplicateOptionError, MissingSectionHeade
 from tkinter import Label, StringVar, messagebox
 from datetime import datetime
 from PIL import Image,ImageTk
+from urllib import request as urlreq
+from io import BytesIO
+
 date_today = datetime.now().date()
 date_today_ls = str(date_today).split('-')
 date_2 = str(date_today).split('-')[2]
@@ -37,6 +40,17 @@ url = 'http://api.openweathermap.org/data/2.5/weather?q={}&appid={}'
 # weather details
 lat =''
 long = ''
+
+def generate_tk_image(icon):
+    URL = "https://openweathermap.org/img/wn/" + icon +".png"
+    u = urlreq.urlopen(URL)
+    raw_data = u.read()
+    u.close()
+
+    im = Image.open(BytesIO(raw_data))
+    im = im.resize((32, 32))
+    return ImageTk.PhotoImage(im)
+
 def getweather(city):
     result = requests.get(url.format(city, api_key))
       
@@ -47,10 +61,11 @@ def getweather(city):
         temp_kelvin = json['main']['temp']
         temp_celsius = temp_kelvin-273.15  
         weather1 = json['weather'][0]['main']
+        icon1 = json['weather'][0]['icon']
         humidity = json['main']['humidity']
         windspd = json['wind']['speed']
         final = [city, country, temp_kelvin, 
-                 temp_celsius, weather1,humidity,windspd]
+                 temp_celsius, weather1,humidity,windspd, icon1]
         global lat,long
         lat = json['coord']['lat']
         long = json['coord']['lon']
@@ -70,9 +85,15 @@ def search():
     if weather:
         location_lbl['text'] = '{} ,{}'.format(weather[0].split(',')[0], weather[1]['country'])
         temperature_label['text'] = str(format(weather[3],".1f"))+"   ° Celsius"
-        weather_l['text'] = weather[4] 
+        
         humidity_l['text']=str(weather[5])+"%"
         wind_spd['text']=weather[6]
+        icon1 = weather[7]
+
+        img = generate_tk_image(icon1)
+        weather_l.config(text=weather[4], image = img)
+        weather_l["compound"] = tk.LEFT
+        weather_l.image = img
 
         url2="https://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&exclude=hourly&appid={}"
         dailyreq = requests.get(url2.format(lat,long,api_key))
@@ -81,32 +102,47 @@ def search():
         #day2 modifications
         location_lbl2['text'] = '{} ,{}'.format(weather[0].split(',')[0], weather[1]['country'])
         temperature_label2.config(text=str(format(dailyreqj['daily'][1]['temp']['max'] -273.15,".1f"))+ "   ° Celsius")
-        weather_l2.config(text=dailyreqj['daily'][1]['weather'][0]['main']) 
         humidity_l2.config(text=str(dailyreqj['daily'][1]['humidity'])+"%") 
         wind_spd2.config(text=dailyreqj['daily'][1]['wind_speed'])
+
+        img = generate_tk_image(dailyreqj['daily'][1]['weather'][0]['icon'])
+        weather_l2.config(text=dailyreqj['daily'][1]['weather'][0]['main'], image = img)
+        weather_l2["compound"] = tk.LEFT
+        weather_l2.image = img
 
         #day3 mods
         location_lbl3['text'] = '{} ,{}'.format(weather[0].split(',')[0], weather[1]['country'])
         temperature_label3.config(text=str(format(dailyreqj['daily'][2]['temp']['max'] -273.15,".1f"))+ "   ° Celsius")
-        weather_l3.config(text=dailyreqj['daily'][2]['weather'][0]['main']) 
         humidity_l3.config(text=str(dailyreqj['daily'][2]['humidity'])+"%") 
         wind_spd3.config(text=dailyreqj['daily'][2]['wind_speed'])
+
+        img = generate_tk_image(dailyreqj['daily'][2]['weather'][0]['icon'])
+        weather_l3.config(text=dailyreqj['daily'][2]['weather'][0]['main'], image = img)
+        weather_l3["compound"] = tk.LEFT
+        weather_l3.image = img
 
         #day4 mods
         location_lbl4['text'] = '{} ,{}'.format(weather[0].split(',')[0], weather[1]['country'])
         temperature_label4.config(text=str(format(dailyreqj['daily'][3]['temp']['max'] -273.15,".1f"))+ "   ° Celsius")
-        weather_l4.config(text=dailyreqj['daily'][3]['weather'][0]['main']) 
         humidity_l4.config(text=str(dailyreqj['daily'][3]['humidity'])+"%") 
         wind_spd4.config(text=dailyreqj['daily'][3]['wind_speed'])
-        
+
+        img = generate_tk_image(dailyreqj['daily'][3]['weather'][0]['icon'])
+        weather_l4.config(text=dailyreqj['daily'][3]['weather'][0]['main'], image = img)
+        weather_l4["compound"] = tk.LEFT
+        weather_l4.image = img
 
         #day5 mods
         location_lbl5['text'] = '{} ,{}'.format(weather[0].split(',')[0], weather[1]['country'])
         temperature_label5.config(text=str(format(dailyreqj['daily'][4]['temp']['max'] -273.15,".1f"))+ "   ° Celsius")
-        weather_l5.config(text=dailyreqj['daily'][4]['weather'][0]['main']) 
         humidity_l5.config(text=str(dailyreqj['daily'][4]['humidity'])+"%") 
         wind_spd5.config(text=dailyreqj['daily'][4]['wind_speed'])
-        print('\n',weather)
+
+        img = generate_tk_image(dailyreqj['daily'][4]['weather'][0]['icon'])
+        weather_l5.config(text=dailyreqj['daily'][4]['weather'][0]['main'], image = img)
+        weather_l5["compound"] = tk.LEFT
+        weather_l5.image = img
+        # print('\n',weather)
           
     else:
         messagebox.showerror('Error', "Cannot find {}".format(city))
